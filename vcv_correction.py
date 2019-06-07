@@ -157,25 +157,33 @@ def var_cov_matrix(tree):
 			zm[j][i] = count
 	return zm
 
+'''
+Takes in tree file and length as integer
+'''
+def do_correction(info, l):
+	
+	names = []
+	matrix = []
+	matrix2 = []
+	for i in info:
+		t,names = read_tree_string(i)
+	matrix = var_cov_matrix(t)
+	for i in range(len(matrix)):
+		matrix2 = []
+		for j in matrix[i]:
+			j *= l
+			matrix2.append(j)
+		print names[i].strip() + " " + str(matrix2)
+	
+
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print "python " + sys.argv[0] + " treefile"+ " AlignmentLength"
-        sys.exit(0)
-    
-    names = []
-    matrix = []
-    matrix2 = []
-    length = 0
-    info = open(sys.argv[1],"r")
-    length = sys.argv[2]
-    l = int(length)
-    for i in info:
-    	t,names = read_tree_string(i)
-    matrix = var_cov_matrix(t)
-    for i in range(len(matrix)):
-    	matrix2 = []
-    	for j in matrix[i]:
-    		j *= l
-    		matrix2.append(j)
-    	print names[i].strip() + " " + str(matrix2)
+	if len(sys.argv) != 3:
+		print "python " + sys.argv[0] + " treefile"+ " AlignmentLength"
+		sys.exit(0)
+
+	length = 0
+	info = open(sys.argv[1],"r")
+	length = sys.argv[2]
+	l = int(length)
+	do_correction(info, l)
 
