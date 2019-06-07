@@ -1,7 +1,7 @@
 '''
 Program to get tree length, concordance or whatever
 '''
-import sys, tree_utils
+import sys
 from node import Node
  
 #This takes in the newick and the
