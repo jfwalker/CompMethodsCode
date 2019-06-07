@@ -1,7 +1,7 @@
 '''
 Program to get tree length, concordance or whatever
 '''
-import sys
+import sys, tree_utils
 from node import Node
  
 #This takes in the newick and the
@@ -112,10 +112,9 @@ def postorder3(root,bipart):
 	
 		postorder3(i,bipart)
 
-def postorder2(root):
+def postorder2(root,total_array):
 	
 	cutoff = 0
-	total_array = []
 	for i in root.children:
 		#part has children so grab'em
 		if i.children:
@@ -124,21 +123,22 @@ def postorder2(root):
 			bipart.append(str(i.length))
 			bipart.append(str(i.label))
 			postorder3(i,bipart)
-			print "Clade: " + str(bipart)
+			#print "Clade: " + str(bipart)
 			total_array.append(bipart)
 			#if i.label:
 
 		#else:
 		#	print i.label
-				
-		postorder2(i)
+			
+		postorder2(i,total_array)
 	return total_array
 
 '''
 Compare the bipartitions
 '''
 def comp_biparts(tree1,tree2):
-	print "HERE"
+	for i in tree1:
+		print i
 
 if __name__ == "__main__":
 	if len(sys.argv) != 3:
@@ -150,17 +150,19 @@ if __name__ == "__main__":
 	'''
 	tree1_biparts = []
 	tree2_biparts = []
+	total_array = []
 	cutoff = 0
 	t1 = open(sys.argv[1],"r")
 	for i in t1:
 		n1 = i
 	tree1 = build(n1)
-	postorder2(tree1)
+	tree1_biparts = postorder2(tree1, total_array)
 	t2 = open(sys.argv[2],"r")
 	for i in t2:
 		n2 = i
 	tree2 = build(n2)
-	postorder2(tree2)
+	total_array = []
+	tree2_biparts = postorder2(tree2, total_array)
 	
-	comp_biparts(tree2,tree2)
+	comp_biparts(tree1_biparts,tree2_biparts)
 
