@@ -1,7 +1,7 @@
 '''
 Program to get tree length, concordance or whatever
 '''
-import sys, tree_utils
+import sys
 from node import Node
  
 #This takes in the newick and the
@@ -119,6 +119,7 @@ def postorder2(root,total_array):
 		#part has children so grab'em
 		if i.children:
 			#checks internal labels
+			#if i.label
 			bipart = []
 			bipart.append(str(i.length))
 			bipart.append(str(i.label))
@@ -133,12 +134,76 @@ def postorder2(root,total_array):
 		postorder2(i,total_array)
 	return total_array
 
+def unique_array(array,tree1,tree2):
+	all_species = set()
+	for x in array:
+		all_species.add(x)
+	mis1 = list(set(all_species) - set(tree1))
+	mis2 = list(set(all_species) - set(tree2))
+	return mis1,mis2
+
+'''
+How do the biparts relate
+'''
+def bipart_properties(bp1,bp2):
+	
+	keepgoing = "false"
+	#difference in the biparts
+	diff1 = list(set(bp1) - set(bp2))
+	diff2 = list(set(bp2) - set(bp1))
+
+	print "bipart 1: " + str(bp1)
+	print "bipart 2: " + str(bp2)
+	print diff1
+	print diff2
+	#check for no overlp
+	if len(bp1) == 1 or len(bp2) == 1:
+		print "uninformative"
+	elif len(diff1) == len(bp1):
+		print "no comp"
+	#check if nested
+	elif len(bp1) == len(bp2) and len(diff1) == 0:
+		print "identical"
+	elif len(diff1) == 0:
+		print "nested in 2"
+	elif len(diff2) == 0:
+		print "nested in 1"
+	else:
+		print "conflict"
+
+	
+		
+
+
 '''
 Compare the bipartitions
 '''
 def comp_biparts(tree1,tree2):
+	
+	all_names = []
+	test_bp1 = []
+	test_bp2 = []
+	rel = 0
+	all_species = set()
+	'''
+	first two columns of the tree should be names
+	'''
+	all_names = tree1[0][2:] + tree2[0][2:]
+	# get the names, for missing taxa check etc.
+	mis1,mis2 = unique_array(all_names,tree1[0][2:],tree2[0][2:])
 	for i in tree1:
-		print i
+		for j in tree2:
+			#i is bipart from tree1 (species tree), check for concordance
+			#unable to speak to, and conflict for everything in tree2
+			#remove stuff that's not going to be found first
+			
+			test_bp1 = list(set(i[2:]) - set(mis2))
+			test_bp2 = list(set(j[2:]) - set(mis1))
+			
+			rel = bipart_properties(test_bp1,test_bp2)
+	
+	
+	
 
 if __name__ == "__main__":
 	if len(sys.argv) != 3:
