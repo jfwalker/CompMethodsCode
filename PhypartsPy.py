@@ -213,7 +213,7 @@ def comp_biparts(tree1,tree2,name_array1,name_array2,log_name):
 			rel = bipart_properties(test_bp1,test_bp2)
 			outf.write(str(rel) + ": " + str(test_bp1) + " " + str(test_bp2) + "\n")
 			if rel == "conflict" or rel == "concordant":
-				print str(count) + "\t" + str(rel) + "\t" + str(test_bp1) + "\t" + str(test_bp2) + "\t" + str (j[1]) + "\t" + str(j[0])
+				print str(count) + "\t" + str(i) + "\t" + str(rel) + "\t" + str(test_bp1) + "\t" + str(test_bp2) + "\t" + str (j[1]) + "\t" + str(j[0])
 		count += 1 		
 	
 	
