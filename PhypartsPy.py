@@ -11,6 +11,7 @@ from node import Node
 def build(instr):
 	#print "Entered build"
 	root = None
+	name_array =[]
 	index = 0
 	nextchar = instr[index]
 	begining = "Yep"
@@ -96,13 +97,14 @@ def build(instr):
 				index += 1
 				nextchar = instr[index]
 			current_node.label = name
+			name_array.append(name)
 			index -= 1
 		if index < len(instr) - 1:
 			index += 1
 		nextchar = instr[index]
 		name = ""
 		branch = ""
-	return root
+	return root,name_array
 
 
 def postorder3(root,bipart):
@@ -152,24 +154,30 @@ def bipart_properties(bp1,bp2):
 	diff1 = list(set(bp1) - set(bp2))
 	diff2 = list(set(bp2) - set(bp1))
 
-	print "bipart 1: " + str(bp1)
-	print "bipart 2: " + str(bp2)
-	print diff1
-	print diff2
+	#print "bipart 1: " + str(bp1)
+	#print "bipart 2: " + str(bp2)
+	#print diff1
+	#print diff2
 	#check for no overlp
 	if len(bp1) == 1 or len(bp2) == 1:
-		print "uninformative"
+		#print "uninformative"
+		return "uninformative"
 	elif len(diff1) == len(bp1):
-		print "no comp"
+		#print "no comp"
+		return "no_comp"
 	#check if nested
 	elif len(bp1) == len(bp2) and len(diff1) == 0:
-		print "identical"
+		#print "identical"
+		return "concordant"
 	elif len(diff1) == 0:
-		print "nested in 2"
+		#print "nested in 2"
+		return "1 nested in 2"
 	elif len(diff2) == 0:
-		print "nested in 1"
+		#print "nested in 1"
+		return "2 nested in 1"
 	else:
-		print "conflict"
+		#print "conflict"
+		return "conflict"
 
 	
 		
@@ -178,19 +186,21 @@ def bipart_properties(bp1,bp2):
 '''
 Compare the bipartitions
 '''
-def comp_biparts(tree1,tree2):
+def comp_biparts(tree1,tree2,name_array1,name_array2,log_name):
 	
 	all_names = []
 	test_bp1 = []
 	test_bp2 = []
 	rel = 0
 	all_species = set()
+	outf = open(log_name + ".log", "w")
 	'''
-	first two columns of the tree should be names
+	get names to know what can and can't be evaluated
 	'''
-	all_names = tree1[0][2:] + tree2[0][2:]
+	all_names = name_array1 + name_array2
 	# get the names, for missing taxa check etc.
-	mis1,mis2 = unique_array(all_names,tree1[0][2:],tree2[0][2:])
+	mis1,mis2 = unique_array(all_names,name_array1,name_array2)
+	count = 0
 	for i in tree1:
 		for j in tree2:
 			#i is bipart from tree1 (species tree), check for concordance
@@ -201,6 +211,10 @@ def comp_biparts(tree1,tree2):
 			test_bp2 = list(set(j[2:]) - set(mis1))
 			
 			rel = bipart_properties(test_bp1,test_bp2)
+			outf.write(str(rel) + ": " + str(test_bp1) + " " + str(test_bp2) + "\n")
+			if rel == "conflict" or rel == "concordant":
+				print str(count) + "\t" + str(rel) + "\t" + str(test_bp1) + "\t" + str(test_bp2) + "\t" + str (j[1]) + "\t" + str(j[0])
+		count += 1 		
 	
 	
 	
@@ -216,18 +230,20 @@ if __name__ == "__main__":
 	tree1_biparts = []
 	tree2_biparts = []
 	total_array = []
+	name_array1 = []
+	name_array2 = []
 	cutoff = 0
 	t1 = open(sys.argv[1],"r")
 	for i in t1:
 		n1 = i
-	tree1 = build(n1)
+	tree1,name_array1 = build(n1)
 	tree1_biparts = postorder2(tree1, total_array)
 	t2 = open(sys.argv[2],"r")
 	for i in t2:
 		n2 = i
-	tree2 = build(n2)
+	tree2,name_array2 = build(n2)
 	total_array = []
 	tree2_biparts = postorder2(tree2, total_array)
 	
-	comp_biparts(tree1_biparts,tree2_biparts)
+	comp_biparts(tree1_biparts,tree2_biparts,name_array1,name_array2, sys.argv[2])
 
