@@ -158,7 +158,7 @@ def var_cov_matrix(tree):
 	return zm
 
 '''
-Takes in tree file and length as integer
+Takes in tree file and length as integer (added later, maybe?)
 '''
 def do_correction(info, l):
 	
@@ -174,16 +174,83 @@ def do_correction(info, l):
 			j *= l
 			matrix2.append(j)
 		print names[i].strip() + " " + str(matrix2)
+
+def name_order(species_tree_names,gene_tree_names):
+	
+	order_array = []
+	for i in species_tree_names:
+		for j in range(0,len(gene_tree_names)):
+			if i == gene_tree_names[j]:
+				order_array.append(j)
+	return order_array
+		
 	
 
 if __name__ == "__main__":
-	if len(sys.argv) != 3:
-		print "python " + sys.argv[0] + " treefile"+ " AlignmentLength"
+	if len(sys.argv) != 4:
+		print "python " + sys.argv[0] + " SpeciesTree" + " OtherTrees" + " SpeciesOfInterest"
 		sys.exit(0)
 
 	length = 0
 	info = open(sys.argv[1],"r")
-	length = sys.argv[2]
-	l = int(length)
-	do_correction(info, l)
+	info2 = open(sys.argv[2],"r")
+	SpeciesOfInterest = sys.argv[3]
+	outf = open(SpeciesOfInterest + ".log", "w")
+	#length adjustment for later
+	#length = sys.argv[2]
+	#l = int(length)
+	#do_correction(info, l)
+	for i in info:
+		t,names = read_tree_string(i)
+	matrix = var_cov_matrix(t)
+	
+	for i in names:
+		outf.write(i + "\t")
+	outf.write("\n")
+	
+	
+	#print aspects of first matrix
+	for i in range(len(matrix)):
+		print names[i].strip() + " " + str(matrix[i])
+	
+	matrix = []
+	for i in info2:
+		order = []
+		t,gene_names = read_tree_string(i)
+		matrix = var_cov_matrix(t)
+		print gene_names
+		order = name_order(names,gene_names)
+		print order
+		
+		reordered_rows = []
+		for j in order:
+			reordered_rows.append(matrix[j])
+		
+		reordered_cols = []
+		for i in reordered_rows:
+			temp = []
+			for j in order:
+				temp.append(i[j])
+			reordered_cols.append(temp)
+
+		for i in range(len(reordered_cols)):
+			#print names[i].strip() + " " + str(reordered_cols[i])
+			if names[i] == SpeciesOfInterest:
+				print names[i].strip() + " " + str(reordered_cols[i])
+				for j in reordered_cols[i]:
+					outf.write(str(j) + "\t")
+				outf.write("\n")
+					
+			
+		
+		
+		
+		
+	
+		
+		
+		
+		
+		
+		
 
